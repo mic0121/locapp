@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Localiser</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -15,16 +16,17 @@
         }
         * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, system-ui, sans-serif; }
         
-        /* FORCE FULLSCREEN NO BARS */
         body, html { 
             height: 100%; width: 100%; 
             background: #000; overflow: hidden; 
-            position: fixed; /* Évite le rebond sur iOS */
+            position: fixed;
+            -webkit-tap-highlight-color: transparent;
         }
 
+        /* Suppression de la barre noire potentielle */
         #map { 
             position: absolute; top:0; left:0; 
-            width: 100%; height: 100%; 
+            width: 100vw; height: 100vh; 
             z-index: 1; background: #e5e3df; 
         }
 
@@ -32,7 +34,6 @@
         #setup input { background: #1c1c1e; border: none; padding: 20px; border-radius: 14px; color: white; font-size: 17px; margin-bottom: 20px; outline: none; }
         #setup button { background: var(--ios-blue); border: none; padding: 18px; border-radius: 14px; color: white; font-weight: 600; }
 
-        /* TOP NAV - ULTIMATE ROUNDED BUBBLE */
         .top-nav { position: absolute; top: var(--safe-top); left: 0; right: 0; z-index: 100; display: flex; justify-content: center; padding: 10px 16px; pointer-events: none; }
         .pill-center { background: rgba(40,40,40,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 8px 20px; border-radius: 15px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         
@@ -43,13 +44,26 @@
         }
         .tool-btn { width: 46px; height: 46px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* AIRTAG MARKER */
+        /* AIRTAG MARKER AVEC LUEUR ANIMÉE */
         .at-marker { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-        .at-glow { position: absolute; width: 120px; height: 120px; background: radial-gradient(circle, rgba(10,132,255,0.45) 0%, transparent 70%); border-radius: 50%; }
+        
+        .at-glow { 
+            position: absolute; 
+            width: 100px; height: 100px; 
+            background: radial-gradient(circle, rgba(10,132,255,0.6) 0%, transparent 75%); 
+            border-radius: 50%;
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.85); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(0.85); opacity: 0.4; }
+        }
+
         .at-disc { position: relative; width: 34px; height: 34px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .at-disc::after { content: ""; width: 10px; height: 10px; border: 3px solid black; border-radius: 50%; }
 
-        /* BOTTOM SHEET - FULL DISAPPEARANCE */
         .sheet { 
             position: absolute; bottom: 0; left: 0; right: 0; z-index: 200; 
             background: rgba(28,28,30,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
@@ -57,7 +71,7 @@
             transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             height: 380px; 
         }
-        .sheet.hidden { transform: translateY(100%); } /* Sort complètement de l'écran */
+        .sheet.hidden { transform: translateY(100%); }
 
         .handle-bar { width: 40px; height: 5px; background: #555; border-radius: 10px; margin: 0 auto 20px; cursor: pointer; padding: 15px 0; background-clip: content-box; }
 
@@ -73,7 +87,6 @@
         .action-card { background: #3a3a3c; border-radius: 16px; padding: 16px; border: none; text-align: left; }
         .action-card b { color: var(--ios-blue); font-size: 16px; display: block; margin-top: 8px; }
 
-        /* FLOATING TAB BAR - TRIGGER TO RECOVER MENU */
         .tab-bar {
             position: absolute; bottom: calc(var(--safe-bottom) + 15px); left: 15px; right: 15px; z-index: 300;
             background: rgba(40,40,40,0.8); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
@@ -168,7 +181,6 @@
             document.getElementById('setup').style.display = 'none';
             document.getElementById('mapscreen').style.display = 'block';
             
-            // Map Standard pour éviter le fond blanc
             map = L.map('map', { center: [userPos.lat, userPos.lng], zoom: 16, zoomControl: false, attributionControl: false });
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -176,6 +188,9 @@
             marker = L.marker([userPos.lat, userPos.lng], { 
                 icon: L.divIcon({ className: '', html: iconHTML, iconSize: [60, 60], iconAnchor: [30, 30] }) 
             }).addTo(map);
+
+            // Force un rafraîchissement de la taille pour éviter la barre noire
+            setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
         document.getElementById('secret-trigger').addEventListener('click', () => {
@@ -206,7 +221,6 @@
             function step(now) {
                 const progress = Math.min((now - startTime) / 5000, 1);
                 const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-                
                 const lat = start.lat + (target.lat - start.lat) * ease;
                 const lng = start.lng + (target.lng - start.lng) * ease;
                 
