@@ -16,38 +16,30 @@
             --map-bg: #e5e3df;
         }
 
-        /* STRATÉGIE ANTI-BARRE : On force une hauteur supérieure à 100% */
-        html {
-            height: 100%;
-            overflow: hidden;
-            background: #000;
-        }
-
-        body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            position: fixed; /* Bloque le scroll système */
+        /* SOLUTION ULTIME : dvh (Dynamic Viewport Height) */
+        html, body {
+            height: 100dvh; /* S'adapte en temps réel à la présence ou non de la barre */
+            width: 100vw;
+            margin: 0; padding: 0;
             background: var(--map-bg);
-            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
+            position: fixed;
         }
 
-        /* La carte s'étend au-delà des limites pour "manger" la zone de la barre noire */
         #map {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0; /* Prend tout l'espace disponible */
+            height: 100dvh;
             width: 100%;
-            height: calc(100% + 1px); /* Force le navigateur à croire qu'il y a un micro-scroll */
             z-index: 1;
         }
 
+        /* SETUP SCREEN */
         #setup { position: fixed; inset: 0; z-index: 9999; background: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
         #setup input { background: #1c1c1e; border: none; padding: 20px; border-radius: 14px; color: white; font-size: 17px; margin-bottom: 20px; outline: none; }
         #setup button { background: var(--ios-blue); border: none; padding: 18px; border-radius: 14px; color: white; font-weight: 600; }
 
-        /* UI TOP */
+        /* TOP NAV */
         .top-nav { position: absolute; top: var(--safe-top); left: 0; right: 0; z-index: 100; display: flex; justify-content: center; padding: 10px 16px; pointer-events: none; }
         .pill-center { background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 8px 22px; border-radius: 20px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; }
         
@@ -56,51 +48,47 @@
             background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-radius: 25px; display: flex; flex-direction: column; pointer-events: auto; width: 50px; overflow: hidden;
         }
-        .tool-btn { width: 50px; height: 50px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .tool-btn { width: 50px; height: 50px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; }
 
-        /* AIRTAG MARKER AVEC LUEUR */
+        /* MARKER */
         .at-marker { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .at-glow { 
             position: absolute; width: 120px; height: 120px; 
-            background: radial-gradient(circle, rgba(10,132,255,0.5) 0%, transparent 70%); 
-            border-radius: 50%;
-            animation: breathe 3s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(10,132,255,0.4) 0%, transparent 70%); 
+            border-radius: 50%; animation: breathe 3s infinite;
         }
-        @keyframes breathe {
-            0%, 100% { transform: scale(0.8); opacity: 0.3; }
-            50% { transform: scale(1.15); opacity: 0.6; }
-        }
+        @keyframes breathe { 0%, 100% { transform: scale(0.8); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.6; } }
         .at-disc { position: relative; width: 36px; height: 36px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .at-disc::after { content: ""; width: 12px; height: 12px; border: 3px solid black; border-radius: 50%; }
 
-        /* BOTTOM SHEET - HAUTEUR FIXÉE À 42% */
+        /* SHEET - MAXIMUM 40% DE L'ÉCRAN */
         .sheet { 
             position: absolute; bottom: 0; left: 0; right: 0; z-index: 200; 
             background: rgba(28,28,30,0.96); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border-radius: 24px 24px 0 0; 
-            padding: 12px 16px 20px;
-            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            height: 42vh; 
+            border-radius: 24px 24px 0 0; padding: 12px 16px 20px;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            height: 40dvh; 
             box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
         }
-        .sheet.hidden { transform: translateY(110%); }
+        .sheet.hidden { transform: translateY(100%); }
         .handle-bar { width: 36px; height: 5px; background: #555; border-radius: 10px; margin: 0 auto 15px; cursor: pointer; padding: 10px 0; background-clip: content-box; }
 
         .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .at-icon-small { width: 54px; height: 54px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
-        .at-icon-small::after { content:""; width:12px; height:12px; border:3px solid black; border-radius:50%; }
+        .at-icon-small { width: 54px; height: 54px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
         .status-dot { position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; border: 3px solid #1c1c1e; background: var(--ios-green); }
 
-        .title-box h1 { font-size: 22px; font-weight: 700; color: white; line-height: 1.1; }
-        .title-box p { color: #8e8e93; font-size: 14px; margin-top: 2px; }
+        .title-box h1 { font-size: 22px; font-weight: 700; color: white; margin:0; }
+        .title-box p { color: #8e8e93; font-size: 14px; margin: 2px 0 0; }
 
         .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .action-card { background: #3a3a3c; border-radius: 14px; padding: 14px; border: none; text-align: left; }
+        .action-card { background: #3a3a3c; border-radius: 14px; padding: 14px; text-align: left; }
         .action-card b { color: var(--ios-blue); font-size: 15px; display: block; margin-top: 6px; }
 
-        /* TAB BAR */
+        /* TAB BAR - PLACÉE AVEC DVH ET SAFE AREA */
         .tab-bar {
-            position: absolute; bottom: calc(var(--safe-bottom) + 12px); left: 12px; right: 12px; z-index: 300;
+            position: absolute; 
+            bottom: calc(var(--safe-bottom) + 10px); 
+            left: 12px; right: 12px; z-index: 300;
             background: rgba(45,45,45,0.85); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
             border-radius: 22px; height: 72px; display: grid; grid-template-columns: repeat(4, 1fr);
             border: 0.5px solid rgba(255,255,255,0.1);
@@ -136,7 +124,7 @@
         <div class="sheet" id="sheet">
             <div class="handle-bar" onclick="hideSheet()"></div>
             <div class="header">
-                <div class="at-icon-small"><div class="status-dot" id="dot"></div></div>
+                <div class="at-icon-small"><div style="width:12px; height:12px; border:3px solid black; border-radius:50%"></div><div class="status-dot" id="dot"></div></div>
                 <div class="title-box">
                     <h1 id="h1-name">Mon AirTag</h1>
                     <p id="status">À l'instant • Avec vous</p>
@@ -145,7 +133,7 @@
             <div class="actions">
                 <div class="action-card">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                    <b>Émettre un son</b>
+                    <b>Son</b>
                 </div>
                 <div class="action-card">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#32d74b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
@@ -164,7 +152,6 @@
 
     <script>
         let map, marker, userPos, destPos, isAtDest = false;
-
         function hideSheet() { document.getElementById('sheet').classList.add('hidden'); }
         function showSheet() { document.getElementById('sheet').classList.remove('hidden'); }
 
@@ -184,7 +171,7 @@
                         initMap();
                     }, () => { userPos = { lat: 48.8566, lng: 2.3522 }; initMap(); });
                 }
-            } catch(e) { alert("Lieu non trouvé"); }
+            } catch(e) { alert("Erreur"); }
         });
 
         function initMap() {
@@ -197,9 +184,9 @@
                 icon: L.divIcon({ className: '', html: iconHTML, iconSize: [60, 60], iconAnchor: [30, 30] }) 
             }).addTo(map);
             
-            // Empêche tout mouvement parasite
-            document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
-            setTimeout(() => { map.invalidateSize(); }, 300);
+            // On s'assure que Safari ne scroll pas
+            document.addEventListener('touchmove', (e) => { if(e.target.id !== 'map') e.preventDefault(); }, { passive: false });
+            setTimeout(() => { map.invalidateSize(); }, 400);
         }
 
         document.getElementById('secret-trigger').addEventListener('click', () => {
