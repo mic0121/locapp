@@ -13,24 +13,34 @@
             --ios-blue: #0a84ff; --ios-green: #32d74b; --ios-red: #ff453a; --ios-yellow: #ffd60a;
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
-            --map-bg: #e5e3df; /* Couleur exacte d'OpenStreetMap */
+            --map-bg: #e5e3df;
         }
 
-        /* ON COLORE TOUT COMME LA CARTE POUR CAMOUFLER LES BARRES */
-        html, body {
-            height: 100%; width: 100%;
-            margin: 0; padding: 0;
-            background: var(--map-bg); 
+        /* STRATÉGIE ANTI-BARRE : On force une hauteur supérieure à 100% */
+        html {
+            height: 100%;
             overflow: hidden;
-            position: fixed;
+            background: #000;
         }
 
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: fixed; /* Bloque le scroll système */
+            background: var(--map-bg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* La carte s'étend au-delà des limites pour "manger" la zone de la barre noire */
         #map {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 1px); /* Force le navigateur à croire qu'il y a un micro-scroll */
             z-index: 1;
-            background: var(--map-bg);
         }
 
         #setup { position: fixed; inset: 0; z-index: 9999; background: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
@@ -39,7 +49,7 @@
 
         /* UI TOP */
         .top-nav { position: absolute; top: var(--safe-top); left: 0; right: 0; z-index: 100; display: flex; justify-content: center; padding: 10px 16px; pointer-events: none; }
-        .pill-center { background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 8px 22px; border-radius: 20px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .pill-center { background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 8px 22px; border-radius: 20px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; }
         
         .tool-stack { 
             position: absolute; right: 16px; top: 10px;
@@ -48,7 +58,7 @@
         }
         .tool-btn { width: 50px; height: 50px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* AIRTAG MARKER */
+        /* AIRTAG MARKER AVEC LUEUR */
         .at-marker { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .at-glow { 
             position: absolute; width: 120px; height: 120px; 
@@ -58,20 +68,20 @@
         }
         @keyframes breathe {
             0%, 100% { transform: scale(0.8); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.6; }
+            50% { transform: scale(1.15); opacity: 0.6; }
         }
         .at-disc { position: relative; width: 36px; height: 36px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .at-disc::after { content: ""; width: 12px; height: 12px; border: 3px solid black; border-radius: 50%; }
 
-        /* BOTTOM SHEET - LIMITÉE À MOINS DE LA MOITIÉ */
+        /* BOTTOM SHEET - HAUTEUR FIXÉE À 42% */
         .sheet { 
             position: absolute; bottom: 0; left: 0; right: 0; z-index: 200; 
             background: rgba(28,28,30,0.96); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-radius: 24px 24px 0 0; 
             padding: 12px 16px 20px;
             transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            height: 42%; /* S'arrête un peu avant la moitié */
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            height: 42vh; 
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.4);
         }
         .sheet.hidden { transform: translateY(110%); }
         .handle-bar { width: 36px; height: 5px; background: #555; border-radius: 10px; margin: 0 auto 15px; cursor: pointer; padding: 10px 0; background-clip: content-box; }
@@ -90,9 +100,9 @@
 
         /* TAB BAR */
         .tab-bar {
-            position: absolute; bottom: calc(var(--safe-bottom) + 10px); left: 12px; right: 12px; z-index: 300;
-            background: rgba(45,45,45,0.8); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border-radius: 20px; height: 70px; display: grid; grid-template-columns: repeat(4, 1fr);
+            position: absolute; bottom: calc(var(--safe-bottom) + 12px); left: 12px; right: 12px; z-index: 300;
+            background: rgba(45,45,45,0.85); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            border-radius: 22px; height: 72px; display: grid; grid-template-columns: repeat(4, 1fr);
             border: 0.5px solid rgba(255,255,255,0.1);
         }
         .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8e8e93; font-size: 10px; gap: 4px; }
@@ -172,7 +182,7 @@
                     navigator.geolocation.getCurrentPosition(p => {
                         userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
                         initMap();
-                    }, () => { userPos = { lat: 45.5017, lng: -73.5673 }; initMap(); });
+                    }, () => { userPos = { lat: 48.8566, lng: 2.3522 }; initMap(); });
                 }
             } catch(e) { alert("Lieu non trouvé"); }
         });
@@ -186,7 +196,10 @@
             marker = L.marker([userPos.lat, userPos.lng], { 
                 icon: L.divIcon({ className: '', html: iconHTML, iconSize: [60, 60], iconAnchor: [30, 30] }) 
             }).addTo(map);
-            setTimeout(() => { map.invalidateSize(); }, 500);
+            
+            // Empêche tout mouvement parasite
+            document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+            setTimeout(() => { map.invalidateSize(); }, 300);
         }
 
         document.getElementById('secret-trigger').addEventListener('click', () => {
@@ -205,7 +218,7 @@
                         move(); 
                     }
                 }, 70);
-            }, 1000);
+            }, 800);
         });
 
         function move() {
