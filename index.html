@@ -15,56 +15,54 @@
             --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        /* RESET TOTAL POUR ÉVITER TOUTE BARRE */
+        /* OVERSIZE HACK POUR TUER LA BARRE NOIRE */
         html, body {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
             height: 100%; width: 100%;
             margin: 0; padding: 0;
             background: #000;
             overflow: hidden;
-            -webkit-text-size-adjust: 100%;
+            position: fixed;
         }
 
-        /* LA CARTE PREND TOUT L'ÉCRAN RÉEL */
         #map {
             position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
-            height: 100%; width: 100%;
+            /* On dépasse les bords de l'écran pour être sûr que la carte couvre tout */
+            top: -5%; left: -5%;
+            width: 110%; height: 110%;
             z-index: 1;
             background: #e5e3df;
         }
 
-        /* SETUP SCREEN */
         #setup { position: fixed; inset: 0; z-index: 9999; background: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
         #setup input { background: #1c1c1e; border: none; padding: 20px; border-radius: 14px; color: white; font-size: 17px; margin-bottom: 20px; outline: none; }
         #setup button { background: var(--ios-blue); border: none; padding: 18px; border-radius: 14px; color: white; font-weight: 600; }
 
-        /* UI TOP - BUBBLE SANS LIGNE */
+        /* TOP NAV - BUBBLE PERFECT ROUNDED */
         .top-nav { position: absolute; top: var(--safe-top); left: 0; right: 0; z-index: 100; display: flex; justify-content: center; padding: 10px 16px; pointer-events: none; }
-        .pill-center { background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 8px 22px; border-radius: 16px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.25); }
+        .pill-center { background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 8px 22px; border-radius: 20px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; }
         
         .tool-stack { 
             position: absolute; right: 16px; top: 10px;
             background: rgba(45,45,45,0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 24px; display: flex; flex-direction: column; pointer-events: auto; width: 48px;
+            border-radius: 25px; display: flex; flex-direction: column; pointer-events: auto; width: 50px;
+            overflow: hidden;
         }
-        .tool-btn { width: 48px; height: 48px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .tool-btn { width: 50px; height: 50px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* AIRTAG & GLOW ANIMATION */
+        /* AIRTAG MARKER & LUEUR PRO */
         .at-marker { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .at-glow { 
-            position: absolute; width: 110px; height: 110px; 
-            background: radial-gradient(circle, rgba(10,132,255,0.6) 0%, transparent 75%); 
+            position: absolute; width: 120px; height: 120px; 
+            background: radial-gradient(circle, rgba(10,132,255,0.5) 0%, transparent 70%); 
             border-radius: 50%;
-            animation: breathe 3.5s ease-in-out infinite;
+            animation: breathe 3s ease-in-out infinite;
         }
         @keyframes breathe {
-            0%, 100% { transform: scale(0.8); opacity: 0.3; }
-            50% { transform: scale(1.2); opacity: 0.7; }
+            0%, 100% { transform: scale(0.8); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 0.7; }
         }
-        .at-disc { position: relative; width: 34px; height: 34px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .at-disc::after { content: ""; width: 10px; height: 10px; border: 3px solid black; border-radius: 50%; }
+        .at-disc { position: relative; width: 36px; height: 36px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .at-disc::after { content: ""; width: 12px; height: 12px; border: 3px solid black; border-radius: 50%; }
 
         /* BOTTOM SHEET */
         .sheet { 
@@ -89,7 +87,7 @@
         .action-card { background: #3a3a3c; border-radius: 16px; padding: 16px; border: none; text-align: left; }
         .action-card b { color: var(--ios-blue); font-size: 16px; display: block; margin-top: 8px; }
 
-        /* TAB BAR */
+        /* TAB BAR - ZONE DE RÉCUPÉRATION */
         .tab-bar {
             position: absolute; bottom: calc(var(--safe-bottom) + 15px); left: 15px; right: 15px; z-index: 300;
             background: rgba(45,45,45,0.8); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
@@ -119,8 +117,8 @@
         <div class="top-nav">
             <div class="pill-center" id="pill-name">Mon AirTag</div>
             <div class="tool-stack">
-                <button class="tool-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5"/></svg></button>
-                <button class="tool-btn" id="secret-trigger"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+                <button class="tool-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5"/></svg></button>
+                <button class="tool-btn" id="secret-trigger"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
             </div>
         </div>
 
@@ -192,7 +190,7 @@
                 icon: L.divIcon({ className: '', html: iconHTML, iconSize: [60, 60], iconAnchor: [30, 30] }) 
             }).addTo(map);
 
-            window.dispatchEvent(new Event('resize'));
+            setTimeout(() => { map.invalidateSize(); }, 300);
         }
 
         document.getElementById('secret-trigger').addEventListener('click', () => {
