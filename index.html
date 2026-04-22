@@ -11,84 +11,95 @@
         :root {
             --ios-blue: #0a84ff; --ios-green: #32d74b; --ios-red: #ff453a; --ios-yellow: #ffd60a;
             --safe-top: env(safe-area-inset-top, 20px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px); /* Mis à 0 pour coller au bas */
         }
         * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, system-ui, sans-serif; }
         
         body, html { 
-            height: 100vh; width: 100vw; 
+            height: 100%; width: 100%; 
             background: #000; overflow: hidden; 
             position: fixed;
-            bottom: 0; left: 0;
         }
 
+        /* FIX MAP : Assure l'affichage immédiat */
         #map { 
             position: absolute; top:0; left:0; 
             width: 100%; height: 100%; 
-            z-index: 1; background: #e5e3df; 
+            z-index: 1; background: #e5e3df;
         }
 
-        /* TOP NAV */
-        .top-nav { position: absolute; top: var(--safe-top); left: 0; right: 0; z-index: 100; display: flex; justify-content: center; padding: 10px 16px; pointer-events: none; }
-        .pill-center { background: rgba(40,40,40,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 8px 20px; border-radius: 15px; font-weight: 600; font-size: 15px; color: white; pointer-events: auto; }
+        #setup { position: fixed; inset: 0; z-index: 9999; background: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+        #setup input { background: #1c1c1e; border: none; padding: 20px; border-radius: 14px; color: white; font-size: 17px; margin-bottom: 20px; outline: none; }
+        #setup button { background: var(--ios-blue); border: none; padding: 18px; border-radius: 14px; color: white; font-weight: 600; }
+
+        /* TOP NAV - RETOUR AUX BULLES RONDES */
+        .top-nav { 
+            position: absolute; top: var(--safe-top); left: 0; right: 0; 
+            z-index: 100; display: flex; justify-content: center; 
+            padding: 10px 16px; pointer-events: none; 
+        }
+        .pill-center { 
+            background: rgba(40,40,40,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            padding: 8px 20px; border-radius: 25px; /* Bulles bien rondes */
+            font-weight: 600; font-size: 15px; color: white; 
+            pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+        }
         
         .tool-stack { 
             position: absolute; right: 16px; top: 10px;
             background: rgba(40,40,40,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 22px; display: flex; flex-direction: column; pointer-events: auto; width: 46px; overflow: hidden;
+            border-radius: 25px; display: flex; flex-direction: column; pointer-events: auto; width: 46px; overflow: hidden;
         }
         .tool-btn { width: 46px; height: 46px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; }
 
-        /* AIRTAG MARKER */
+        /* MARKER */
         .at-marker { position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .at-glow { position: absolute; width: 120px; height: 120px; background: radial-gradient(circle, rgba(10,132,255,0.45) 0%, transparent 70%); border-radius: 50%; }
         .at-disc { position: relative; width: 34px; height: 34px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .at-disc::after { content: ""; width: 10px; height: 10px; border: 3px solid black; border-radius: 50%; }
 
-        /* BOTTOM SHEET - LIMITÉE À 1/3 DE L'ÉCRAN */
+        /* SHEET - AJUSTEMENT DES PROPORTIONS 1/3 */
         .sheet { 
             position: absolute; bottom: 0; left: 0; right: 0; z-index: 200; 
             background: rgba(28,28,30,0.95); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border-radius: 24px 24px 0 0; padding: 12px 16px env(safe-area-inset-bottom, 20px);
+            border-radius: 24px 24px 0 0; padding: 8px 16px 120px;
             transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            height: 33vh; /* Strictement 1/3 de la hauteur */
+            height: 35vh; /* Environ 1/3 */
         }
         .sheet.hidden { transform: translateY(100%); }
 
-        .handle-bar { width: 40px; height: 5px; background: #555; border-radius: 10px; margin: 0 auto 20px; cursor: pointer; padding: 15px 0; background-clip: content-box; }
+        .handle-bar { width: 36px; height: 5px; background: #555; border-radius: 10px; margin: 0 auto 15px; cursor: pointer; padding: 10px 0; background-clip: content-box; }
 
-        .header { display: flex; align-items: center; gap: 18px; margin-bottom: 25px; }
-        .at-icon-small { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
-        .at-icon-small::after { content:""; width:12px; height:12px; border:3px solid black; border-radius:50%; }
-        .status-dot { position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #1c1c1e; background: var(--ios-green); }
+        /* Contenu du menu plus compact pour tenir dans 1/3 */
+        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .at-icon-small { width: 45px; height: 45px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .at-icon-small::after { content:""; width:10px; height:10px; border:3px solid black; border-radius:50%; }
+        .status-dot { position: absolute; bottom: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #1c1c1e; background: var(--ios-green); }
 
-        .title-box h1 { font-size: 20px; font-weight: 700; color: white; }
-        .title-box p { color: #8e8e93; font-size: 14px; }
+        .title-box h1 { font-size: 19px; font-weight: 700; color: white; }
+        .title-box p { color: #8e8e93; font-size: 13px; }
 
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .action-card { background: #3a3a3c; border-radius: 16px; padding: 14px; border: none; text-align: left; }
-        .action-card b { color: var(--ios-blue); font-size: 15px; display: block; margin-top: 5px; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .action-card { background: #3a3a3c; border-radius: 12px; padding: 12px; border: none; text-align: left; }
+        .action-card b { color: var(--ios-blue); font-size: 14px; display: block; margin-top: 5px; }
 
         /* TAB BAR */
         .tab-bar {
             position: absolute; bottom: 0; left: 0; right: 0; z-index: 300;
             background: rgba(40,40,40,0.8); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            height: 85px; display: grid; grid-template-columns: repeat(4, 1fr);
-            border-top: 0.5px solid rgba(255,255,255,0.1); padding-bottom: env(safe-area-inset-bottom, 20px);
+            height: 80px; display: grid; grid-template-columns: repeat(4, 1fr);
+            border-top: 0.5px solid rgba(255,255,255,0.1); padding-bottom: env(safe-area-inset-bottom, 15px);
         }
         .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8e8e93; font-size: 10px; gap: 4px; }
         .tab-item.active { color: var(--ios-blue); }
-        .tab-icon { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+        .tab-icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; }
 
         #glitch { position: fixed; inset: 0; z-index: 10000; background: #000; display: none; pointer-events: none; }
-        
-        #setup { position: fixed; inset: 0; z-index: 9999; background: #000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
-        #setup input { background: #1c1c1e; border: none; padding: 20px; border-radius: 14px; color: white; font-size: 17px; margin-bottom: 20px; outline: none; }
-        #setup button { background: var(--ios-blue); border: none; padding: 18px; border-radius: 14px; color: white; font-weight: 600; }
     </style>
 </head>
 <body>
+
     <div id="glitch"></div>
+
     <div id="setup">
         <input id="target-name" type="text" placeholder="Nom de l'AirTag" value="Mon AirTag">
         <input id="target-loc" type="text" placeholder="Destination (ex: Rome)">
@@ -97,6 +108,7 @@
 
     <div id="mapscreen" style="display:none">
         <div id="map"></div>
+        
         <div class="top-nav">
             <div class="pill-center" id="pill-name">Mon AirTag</div>
             <div class="tool-stack">
@@ -116,11 +128,11 @@
             </div>
             <div class="actions">
                 <div class="action-card">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                     <b>Émettre un son</b>
                 </div>
                 <div class="action-card">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#32d74b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#32d74b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
                     <b style="color:var(--ios-green)">Rechercher</b>
                 </div>
             </div>
@@ -165,8 +177,12 @@
             document.getElementById('setup').style.display = 'none';
             document.getElementById('mapscreen').style.display = 'block';
             
+            // Re-vérification du lien des tuiles pour éviter le fond blanc
             map = L.map('map', { center: [userPos.lat, userPos.lng], zoom: 16, zoomControl: false, attributionControl: false });
-            L.tileLayer('https://{s}.tile.layer.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            // Force un rafraîchissement de la taille de la carte
+            setTimeout(() => { map.invalidateSize(); }, 200);
 
             const iconHTML = `<div class="at-marker"><div class="at-glow"></div><div class="at-disc"></div></div>`;
             marker = L.marker([userPos.lat, userPos.lng], { 
@@ -178,7 +194,7 @@
             const dot = document.getElementById('dot');
             dot.style.background = 'var(--ios-red)';
             
-            // DÉLAI DE 5 SECONDES (5000ms) AVANT L'EFFET
+            // Délai de 5 secondes
             setTimeout(() => {
                 const g = document.getElementById('glitch');
                 g.style.display = 'block';
@@ -192,7 +208,7 @@
                         moveAirtag(); 
                     }
                 }, 70);
-            }, 5000); 
+            }, 5000);
         });
 
         function moveAirtag() {
